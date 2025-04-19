@@ -1,0 +1,332 @@
+﻿@{
+    ViewBag.Title = "Index";
+    Layout = "~/Views/Shared/_LayoutPage1.cshtml";
+}
+
+<style>
+    /* Nút trợ giúp */
+    .help-btn {
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        background-color: #007bff;
+        color: white;
+        border: none;
+        font-weight: bold;
+        font-size: 20px;
+        transition: 0.3s ease-in-out;
+    }
+
+        .help-btn:hover {
+            background-color: #0056b3;
+            transform: scale(1.1);
+        }
+
+    /* Căn giữa nội dung */
+    .container-center {
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        height: 50vh;
+    }
+
+    .text-start {
+        vertical-align: middle;
+    }
+
+    /* Hiệu ứng nút */
+    .btn-custom {
+        width: 250px;
+        height: 70px;
+        padding: 10px;
+        font-size: 30px;
+        font-weight: bold;
+        justify-content: center;
+        align-items: center;
+        transition: 0.3s ease-in-out;
+    }
+
+        .btn-custom:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 10px rgba(0, 0, 0, 0.2);
+        }
+
+    /* Dialog */
+    dialog {
+        border: none;
+        border-radius: 15px;
+        padding: 20px;
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+        animation: fadeIn 0.3s ease-in-out;
+    }
+
+    @@keyframe fadeIn {
+        from {
+            opacity: 0;
+            transform: translateY(-20px);
+        }
+
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    /* Nút đóng dialog */
+    .close-btn {
+        width: 30px;
+        height: 30px;
+        border-radius: 50%;
+        border: none;
+        background-color: tomato;
+        color: white;
+        font-weight: bold;
+        font-size: 16px;
+        transition: 0.2s;
+    }
+
+        .close-btn:hover {
+            background-color: darkred;
+            transform: scale(1.1);
+        }
+
+    /* Cải thiện giao diện bảng hướng dẫn */
+    .guideBox {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        width: 50px;
+        height: 50px;
+        font-size: 25px;
+        font-weight: bold;
+        border-radius: 8px;
+        margin: 5px;
+    }
+
+    .carousel-indicators {
+        position: relative; /* Không còn bị chồng lên slide */
+        margin-top: 10px; /* Đẩy xuống dưới một chút */
+    }
+
+    .carousel-control-prev,
+    .carousel-control-next {
+        position: relative; /* Không chồng lên nội dung */
+        margin-top: 10px; /* Đẩy xuống một chút */
+    }
+
+    .arrow {
+        color: black;
+        font-weight: bold;
+        font-size: 20px;
+    }
+
+    .carousel-indicators .indicator {
+        background: black;
+        height: 1px;
+        width: 19px;
+        border-radius: 50%;
+    }
+
+    .carousel-indicators .active {
+        background-color: #538d4e !important; /* Màu của indicator đang được chọn */
+    }
+
+    .mode {
+        width: 100px;
+        font-size: 18px;
+    }
+
+    .box {
+        width: 100px;
+        height: 100px;
+        text-align: center;
+        font-size: 70px;
+        border-radius: 10px;
+        background-color: #538d4e;
+    }
+
+    .true {
+        background-color: #538d4e;
+        color: white;
+    }
+
+    .misplace {
+        background-color: #b59f3b;
+        color: white;
+    }
+
+    .wrong {
+        background-color: #3a3a3c;
+        color: white;
+    }
+
+    .title {
+        border-collapse: separate;
+        border-spacing: 5px;
+    }
+
+    .difficulty {
+        font-size: 30px;
+    }
+</style>
+
+<script>
+    sessionStorage.setItem("score", 0);
+</script>
+
+<body>
+    <!-- Nút mở hướng dẫn -->
+    <div class="text-end m-3">
+        <button class="help-btn" onclick="openGuide()">?</button>
+    </div>
+
+    <!-- Nội dung chính -->
+    <!-- title -->
+    <div id="title" class="text-center" style="display: flex; flex-direction: column; justify-content: center; align-items: center; margin-top: 50px;">
+        <div class="mb-2">
+            <table class="title">
+                <tr>
+                    <td class="box fw-bold">W</td>
+                    <td class="box fw-bold">O</td>
+                    <td class="box fw-bold">R</td>
+                    <td class="box fw-bold">D</td>
+                    <td class="box fw-bold">L</td>
+                    <td class="box fw-bold">E</td>
+                </tr>
+            </table>
+        </div>
+    </div>
+
+    <!--Nút chơi game và nút xem bảng xếp hạng-->
+    <div class="container-center text-center">
+        <a href="/ScoreBoards/Index" class="btn btn-dark btn-custom">ScoreBoard</a>
+        <button class="btn btn-dark btn-custom mt-3" onclick="openPlay()">Play</button>
+    </div>
+
+    <!-- Dialog chọn độ khó -->
+    <dialog name="play">
+        <div class="text-end">
+            <button class="close-btn" onclick="closePlay()">X</button>
+        </div>
+        <div class="text-center mt-3">
+            <a href="/Game/Index?tries=7" class="btn btn-dark text-white mx-auto mt-2 mode">Easy</a><br />
+            <a href="/Game/Index?tries=6" class="btn btn-dark text-white mx-auto mt-2 mode">Normal</a><br />
+            <a href="/Game/Index?tries=4" class="btn btn-dark text-white mx-auto mt-2 mode">Hard</a><br />
+        </div>
+    </dialog>
+
+    <!-- Dialog hướng dẫn chơi -->
+
+    <dialog name="guide" style="max-width: 500px; width: 500px; max-height: 590px; height: 590px">
+        <div class="text-end">
+            <button class="close-btn" onclick="closeGuide()">X</button>
+        </div>
+        <div id="guideCarousel" class="carousel slide" data-bs-ride="false">
+            <div class="carousel-inner" style="max-height: 430px; height: 430px">
+                <div class="carousel-item active">
+                    <p class="fw-bold">
+                        You have to guess the hidden word in 6 tries. The color of the letters changes to show how close you are.
+                    </p>
+                    <p>For example:</p>
+                    <div class="d-flex justify-content-center">
+                        <div class="guideBox true text-white">T</div>
+                        <div class="guideBox true text-white">A</div>
+                        <div class="guideBox wrong text-white">B</div>
+                        <div class="guideBox wrong text-white">L</div>
+                        <div class="guideBox misplace text-white">E</div>
+                    </div>
+                    <table class="table mt-3">
+                        <tr>
+                            <td><div class="guideBox wrong"></div></td>
+                            <td class="text-start">This letter is not in the word.</td>
+                        </tr>
+                        <tr>
+                            <td><div class="guideBox misplace"></div></td>
+                            <td class="text-start">This letter is in the word but in the wrong spot.</td>
+                        </tr>
+                        <tr>
+                            <td><div class="guideBox true"></div></td>
+                            <td class="text-start">This letter is in the correct spot.</td>
+                        </tr>
+                    </table>
+                </div>
+
+                <div class="carousel-item">
+                    <div style="margin-top: 70px">
+                        <p class="fw-bold">
+                            There're 3 difficulty, each with a different multiplier!
+                        </p>
+
+                        <p>
+                            <i class="fa-solid fa-face-laugh-beam difficulty"></i>
+                            <span class="fw-bold">Easy</span>
+                            There're 7 tries, with a x0.5 multiplier
+                        </p>
+
+                        <p>
+                            <i class="fa-solid fa-face-smile difficulty"></i>
+                            <span class="fw-bold">Normal</span>
+                            There're 6 tries, with a x1 multiplier
+                        </p>
+
+                        <p>
+                            <i class="fa-solid fa-face-frown-open difficulty"></i>
+                            <span class="fw-bold">Hard</span>
+                            There're 3 tries, with a x3 multiplier
+                        </p>
+
+                        <p>If you win a stage, you will get 2 point and an additional point for each tries you have left</p>
+                        <p class="fw-bold">Your point are counted as:</p>
+                        <p class="mx-auto">previous stage + this stage point * multiplier</p>
+                    </div>
+                </div>
+
+                <div class="carousel-item">
+                    <div style="font-size: 40px; font-weight: bold; margin-left: 40px; margin-top: 150px">Have fun and enjoy!</div>
+                    <i class="fa-solid fa-face-smile-wink" style="font-size: 80px; margin-left: 180px;"></i>
+                </div>
+            </div>
+
+            <div style="display: flex; flex-direction: column; justify-content: center; align-items: center; margin-top: 30px;">
+                <table class="w-100">
+                    <tr>
+                        <td>
+                            <button class="carousel-control-prev mx-auto my-auto" type="button" data-bs-target="#guideCarousel" data-bs-slide="prev">
+                                <i class="fa-solid fa-arrow-left arrow"></i>
+                                <span class="visually-hidden">Previous</span>
+                            </button>
+                        </td>
+
+                        <td>
+                            <div class="carousel-indicators mx-auto my-auto">
+                                <button type="button" data-bs-target="#guideCarousel" data-bs-slide-to="0" class="active indicator" aria-current="true" aria-label="Slide 1"></button>
+                                <button type="button" data-bs-target="#guideCarousel" data-bs-slide-to="1" class="indicator" aria-label="Slide 2"></button>
+                                <button type="button" data-bs-target="#guideCarousel" data-bs-slide-to="2" class="indicator" aria-label="Slide 3"></button>
+                            </div>
+                        </td>
+
+                        <td>
+                            <button class="carousel-control-next mx-auto my-auto" type="button" data-bs-target="#guideCarousel" data-bs-slide="next">
+                                <i class="fa-solid fa-arrow-right arrow"></i>
+                                <span class="visually-hidden">Next</span>
+                            </button>
+                        </td>
+                    </tr>
+                </table>
+            </div>
+        </div>
+    </dialog>
+
+    <!-- JavaScript điều khiển dialog -->
+    <script>
+        const guideDialog = document.querySelector("dialog[name='guide']");
+        const playDialog = document.querySelector("dialog[name='play']");
+
+        function openGuide() { guideDialog.showModal(); }
+        function closeGuide() { guideDialog.close(); }
+
+        function openPlay() { playDialog.showModal(); }
+        function closePlay() { playDialog.close(); }
+    </script>
+</body>

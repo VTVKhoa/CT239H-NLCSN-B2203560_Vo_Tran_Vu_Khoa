@@ -1,0 +1,198 @@
+﻿@model A23017_Cloud.Models.WoD
+
+@{
+    ViewBag.Title = "Create";
+    Layout = "~/Views/Shared/_LayoutPage1.cshtml";
+}
+
+
+<style>
+    .button {
+        border: 0;
+        background: transparent;
+        box-sizing: border-box;
+        width: 0;
+        height: 74px;
+        border-color: transparent transparent transparent #202020;
+        transition: 100ms all ease;
+        cursor: pointer;
+        /* Play state */
+        border-style: solid;
+        border-width: 37px 0 37px 60px;
+    }
+
+        .button.paused {
+            border-style: double;
+            border-width: 0px 0 0px 60px;
+        }
+
+        .button:hover {
+            border-color: transparent transparent transparent #404040;
+        }
+</style>
+
+
+<body>
+    <div>
+        <a href="/WoDs/Index" class="btn btn-warning ms-2">Back</a>
+    </div>
+
+    <div class="text-center align-content-center border border-1 mt-3">
+        <div class="fw-bold fs-3">Total number of word: <span id="count" class="fw-normal fs-2"></span></div>
+        <div class="fw-bold fs-3 mt-2">Number of word added: <span id="added" class="fw-normal fs-2"></span></div>
+    </div>
+
+    <div class="text-center mt-5">
+        <button class="button" onclick="add()"></button>
+    </div>
+
+    <div class="text-center mt-5">
+        <table id="wordTable" class="table table-striped w-50 text-center mx-auto">
+            <tr>
+                <th>No.</th>
+                <th>Word</th>
+            </tr>
+        </table>
+    </div>
+
+    <script>
+        const randApi = "https://random-word-api.vercel.app/api?words=1&length=5";
+        const dicApi = "https://api.dictionaryapi.dev/api/v2/entries/en/";
+
+        let word = "";
+        let phonetic = "N/a";
+        let definition = "";
+        let added;
+
+        let table = document.getElementById("wordTable");
+
+        const formData = new FormData();
+
+        formData.append("Word", word);
+        formData.append("Phonetic", phonetic);
+        formData.append("Definition", definition);
+
+        //btn chuyển từ play -> pause (visual)
+        $(document).ready(function () {
+            var btn = $(".button");
+            btn.click(function () {
+                btn.toggleClass("paused");
+                return false;
+            });
+        });
+
+        //hàm ajax để cập nhật động tổng số lượng từ trong database
+        function updateWordCount() {
+            fetch('/WoDs/getWordCount') // Gọi API từ controller
+                .then(response => response.json())
+                .then(data => {
+                    document.getElementById("count").innerText = data.count; // Cập nhật số từ
+                })
+                .catch(error => console.error('Lỗi:', error));
+        }
+
+        //hàm ajax để cập nhật động tổng số lượng từ vừa thêm vào database
+        function increaseAdded() {
+            fetch('/WoDs/IncreaseAdded') // Gọi API để tăng giá trị
+                .then(response => response.json())
+                .then(data => {
+                    document.getElementById("added").innerText = data.added; // Cập nhật số lượng
+                    added = data.added;
+                    added++;                    
+                })
+                .catch(error => console.error('Lỗi:', error));
+        }
+
+        function getAdded() {
+            fetch("/WoDs/getAdded")
+                .then(response => response.json())
+                .then(data => {
+                    added = data.added;
+                    added++;
+                })
+                .catch(error => console.error("Lỗi: " + error));
+        }
+
+        updateWordCount();
+        getAdded();
+
+        function fetchData() {
+            fetch(randApi)
+                .then(response => {
+                    if (response.ok) {
+                        return response.json();
+                    }
+                })
+                .then(data1 => {
+                    word = data1[0];
+                    console.log(word);
+                    return fetch(dicApi.concat(word));
+                })
+                .then(response => {
+                    if (response.ok) {
+                        //console.log(response.json());
+                        return response.json();
+                    }
+                })
+                .then(data2 => {
+                    if (data2[0]["phonetics"].length > 0) {
+                        if (data2[0]["phonetics"][0].hasOwnProperty("text")) {
+                            phonetic = data2[0]["phonetics"][0]["text"];
+                        } else if (data2[0]["phonetics"].length >= 1 && data2[0]["phonetics"][1].hasOwnProperty("text")) {
+                            phonetic = data2[0]["phonetics"][1]["text"];
+                        } else if (data2[0]["phonetics"].length >= 2 && data2[0]["phonetics"][2].hasOwnProperty("text")) {
+                            phonetic = data2[0]["phonetics"][2]["text"];
+                        }
+                    }
+
+                    definition = data2[0]["meanings"][0]["definitions"][0]["definition"];
+
+                    console.log(phonetic);
+                    console.log(definition);
+                })
+                .then(() => {
+                    formData.delete("Word");
+                    formData.delete("Phonetic");
+                    formData.delete("Definition");
+
+                    formData.append("Word", word);
+                    formData.append("Phonetic", phonetic);
+                    formData.append("Definition", definition);
+
+                    fetch("/WoDs/Create", {
+                        method: "POST",
+                        body: formData,
+                    })
+
+                    updateWordCount();
+                    increaseAdded();
+
+                    let newRow = table.insertRow();
+                    let cell1 = newRow.insertCell(0);
+                    let cell2 = newRow.insertCell(1);
+
+                    cell1.setAttribute("scope", "row");
+
+                    cell1.innerHTML = added;
+                    cell2.innerHTML = word;
+                })
+                .catch(error => {
+                    console.log(error); 
+                })
+        }
+
+        let intervalID;
+        let isPlaying = false;
+
+        function add() {
+            if (isPlaying) {
+                clearInterval(intervalID);
+            }
+            else {
+                intervalID = setInterval(fetchData, 5000);
+            }
+            isPlaying = !isPlaying;
+        }
+
+    </script>
+</body>

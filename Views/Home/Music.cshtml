@@ -1,0 +1,26 @@
+﻿
+@{
+    ViewBag.Title = "Music";
+}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Music Player</title>
+</head>
+<body>
+    <audio id="backgroundMusic" controls autoplay loop>
+        <source src="@Url.Content("~/Assets/audio/puzzle-game-bright-casual-video-game-music-249202.mp3")" type="audio/mpeg">
+    </audio>
+
+    <script>
+        let audio = document.getElementById("backgroundMusic");
+        audio.addEventListener("load", () => {
+            audio.play();
+        })
+    </script>
+</body>
+</html>
+

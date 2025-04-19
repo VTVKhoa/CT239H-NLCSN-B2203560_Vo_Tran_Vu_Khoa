@@ -1,0 +1,335 @@
+﻿@model A23017_Cloud.Models.WoD
+
+@{
+    ViewBag.Title = "Index";
+    Layout = "~/Views/Shared/_LayoutPage1.cshtml";
+}
+
+<head>
+    <style>
+        input {
+            border: 2px solid #333;
+            width: 50px;
+            height: 50px;
+            text-align: center;
+            font-size: 35px;
+            font-weight: bold;
+            border-radius: 10px;
+            text-transform: capitalize;
+            transition: transform 0.5s ease, background-color 0.5s ease;
+            display: inline-block;
+            position: relative;
+        }
+
+        .true {
+            background-color: #538d4e;
+            color: white;
+        }
+
+        .misplace {
+            background-color: #b59f3b;
+            color: white;
+        }
+
+        .wrong {
+            background-color: #3a3a3c;
+            color: white;
+        }
+
+        .flip {
+            animation: flip 0.5s ease forwards;
+        }
+
+        @@keyframes flip {
+            0% {
+                transform: rotateX(0);
+            }
+
+            50% {
+                transform: rotateX(90deg);
+            }
+
+            100% {
+                transform: rotateX(0);
+            }
+        }
+
+        input:focus {
+            transform: scale(1.1);
+            box-shadow: 0px 0px 20px #808080;
+        }
+
+        .keyboard-row {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-wrap: wrap;
+            padding-left: 200px;
+            padding-right: 200px;
+        }
+
+        .key {
+            color: black;
+            font-weight: bold;
+            border: 1px solid #000000;
+            border-radius: 5px;
+            max-width: 50px;
+            height: 50px;
+            text-align: center;
+            align-content: center;
+            margin: 5px 0px 7px 7px;
+            font-size: 20px;
+        }
+
+        .key-function {
+            background-color: white;
+            color: black;
+            font-weight: bold;
+            border: 1px solid #000000;
+            border-radius: 5px;
+            max-width: 70px;
+            height: 50px;
+            text-align: center;
+            align-content: center;
+            margin: 5px 0px 7px 7px;
+            font-size: 20px;
+        }
+
+        body.hidden {
+            visibility: hidden;
+        }
+    </style>
+
+    <script>
+        let point = parseInt(sessionStorage.getItem("score"));
+        let bonus = @ViewBag.Tries;
+
+        //multiplier tương ứng với từng độ khó
+        //easy là 0.5
+        //normal là 1
+        //hard là 3
+        let multiplier = 1;
+        switch (bonus) {
+            case 7:
+                multiplier = 0.5;
+                break;
+            case 4:
+                multiplier = 3;
+        }
+
+        let word = "@Model.Word";
+        let phonetic = "@Model.Phonetic";
+        let definition = "@Model.Definition";
+
+        console.log(word);
+        //console.log(sessionStorage.getItem("score"));
+        //console.log(point);
+    </script>
+</head>
+<body>
+
+    <div class="justify-content-center mx-auto text-center">
+        @{
+            for (int i = 1; i <= ViewBag.Tries; i++)
+            {
+                for (int j = 0; j < 5; j++)
+                {
+                    <input name="words_@i" maxlength="1" class="mx-1 my-2" />
+                }
+                <br />
+            }
+        }
+
+        <div class="row keyboard-row pt-5">
+            <div class="col key" id="q">Q</div>
+            <div class="col key" id="w">W</div>
+            <div class="col key" id="e">E</div>
+            <div class="col key" id="r">R</div>
+            <div class="col key" id="t">T</div>
+            <div class="col key" id="y">Y</div>
+            <div class="col key" id="u">U</div>
+            <div class="col key" id="i">I</div>
+            <div class="col key" id="o">O</div>
+            <div class="col key" id="p">P</div>
+        </div>
+        <div class="row keyboard-row">
+            <div class="col key" id="a">A</div>
+            <div class="col key" id="s">S</div>
+            <div class="col key" id="d">D</div>
+            <div class="col key" id="f">F</div>
+            <div class="col key" id="g">G</div>
+            <div class="col key" id="h">H</div>
+            <div class="col key" id="j">J</div>
+            <div class="col key" id="k">K</div>
+            <div class="col key" id="l">L</div>
+        </div>
+        <div class="row keyboard-row">
+            <div class="col key-function">Enter</div>
+            <div class="col key" id="z">Z</div>
+            <div class="col key" id="x">X</div>
+            <div class="col key" id="c">C</div>
+            <div class="col key" id="v">V</div>
+            <div class="col key" id="b">B</div>
+            <div class="col key" id="n">N</div>
+            <div class="col key" id="m">M</div>
+            <div class="col key-function"><i class="fa-solid fa-delete-left"></i></div>
+        </div>
+    </div>
+
+    <dialog class="w-50 h-75 text-center align-content-center" style="border: none; border-radius: 20px;" name="dialog">
+
+        <div class="fw-bold fs-1" id="message"></div>
+
+        <div class="fw-bold fs-3">The word was</div>
+        <div style="text-align: center; margin-bottom: 3px">
+            <table style="margin:auto">
+                <tr>
+                    <td>
+                        <div id="word">@Model.Word</div>
+                    </td>
+                    <td style="padding-left: 7px">
+                        <button onclick="speakText('@Model.Word')"><i class="fa-solid fa-volume-high"></i></button>
+                    </td>
+                </tr>
+            </table>
+        </div>
+        <div id="phonetic">@Model.Phonetic</div>
+        <div id="definition">@Model.Definition</div>
+        <div>
+            <div class="fs-3 fw-bold mb-0">Your score</div>
+            <div id="point" class="fs-2 mb-3"></div>
+        </div>
+        <div id="continue">
+            @*nút continue*@
+        </div>
+
+        @{
+            if (Session["Username"] != null)
+            {
+                <form method="post" action="/ScoreBoards/Create" class="mt-2">
+                    <input type="hidden" name="Username" value="@Session["Username"]" />
+                    <input type="hidden" name="Score" />
+                    <button type="submit" class="btn btn-danger">Return</button>
+                </form>
+            }
+            else
+            {
+                <a href="/Home/Index" class="btn btn-danger">Return</a>
+            }
+        }
+
+    </dialog>
+
+
+    <script>
+        const inputs = document.querySelectorAll('input');
+        let inputVars = {};
+        const dialog = document.querySelector('dialog[name="dialog"]');
+
+        inputs.forEach(input => {
+            if (!inputVars[input.name]) {
+                inputVars[input.name] = [];
+            }
+            inputVars[input.name].push(input);
+        });
+
+        // Lấy danh sách name của các nhóm (sorted để xác định nhóm cuối)
+        const groupNames = Object.keys(inputVars).sort();
+
+        // Xử lý sự kiện cho từng nhóm input
+        Object.entries(inputVars).forEach(([groupName, group], groupIndex) => {
+            const isLastGroup = groupName === groupNames[groupNames.length - 1]; // Kiểm tra nhóm cuối cùng
+
+            group.forEach((input, index) => {
+                input.addEventListener("keydown", (event) => {
+                    if (event.key === "Backspace") {
+                        event.preventDefault();
+                        if (input.value) {
+                            input.value = "";
+                        } else if (index > 0) {
+                            group[index - 1].focus();
+                        }
+                    }
+                });
+
+                input.addEventListener("input", () => {
+                    if (input.value.length === 1 && index < group.length - 1) {
+                        group[index + 1].focus();
+                    }
+                });
+
+                input.addEventListener("keyup", (event) => {
+                    if (event.key === "Enter" && index === group.length - 1) {
+                        //console.log(`✅ Nhóm ${groupName} đã nhập xong!`);
+
+                        bonus--;
+
+                        let count = 0; // Đếm số ký tự đúng vị trí
+                        group.forEach((inp, i) => {
+                            const char = inp.value.toLowerCase();
+
+                            setTimeout(() => {
+                                inp.classList.add("flip");
+                                if (!word.includes(char)) {
+                                    // ❌Ký tự không có trong từ
+                                    inp.classList.add("wrong"); // Tô đỏ
+                                } else if (word[i] === char) {
+                                    // ✅Đúng vị trí
+                                    inp.classList.add("true"); // Tô xanh
+                                } else {
+                                    // 🟡Có trong từ nhưng sai vị trí
+                                    inp.classList.add("misplace"); // Tô vàng
+                                }
+                            }, i * 300);
+
+                            if (word[i] === char) {
+                                count++;
+                            }
+                        });
+
+                        //Kiểm tra số ký tự nhập đúng
+                        if (count == 5) { //nếu đúng hết thì tăng điểm và hiện thông báo
+                            point = point + Math.ceil((2 + bonus) * multiplier);
+                            sessionStorage.setItem("score", point);
+
+                            document.getElementById("message").innerHTML = "You've won!";
+                            document.getElementById("continue").innerHTML = `<a href="/Game/Index?tries=@ViewBag.Tries" class="btn btn-success">Continue</a>`;
+                            document.getElementById('point').innerHTML = point;
+
+                            if (document.querySelector('input[name="Score"]') != null) {
+                                document.querySelector('input[name="Score"]').value = point;
+                            }
+
+                            document.getElementById("point").innerHTML = point;
+                            dialog.showModal();
+                        }
+                        else {//không thì kiểm tra xem có phải nhóm cuối ko
+                            if (isLastGroup) {//là nhóm cuối => thua
+                                document.getElementById("message").innerHTML = "You've lost! Better next time!";
+                                document.getElementById('point').innerHTML = point;
+
+                                if (document.querySelector('input[name="Score"]') != null) {
+                                    document.querySelector('input[name="Score"]').value = point;
+                                }
+
+                                document.getElementById("point").innerHTML = point;
+
+                                dialog.showModal();
+                            } else {//không phải là nhóm cuối => đến nhóm tiếp theo
+                                const nextGroupName = groupNames[groupIndex + 1];
+                                inputVars[nextGroupName][0].focus();
+                            }
+                        }
+                    }
+                });
+            });
+        });
+
+        //hàm đọc từ
+        function speakText(txt) {
+            const utterance = new SpeechSynthesisUtterance(txt);
+            utterance.lang = "en-US";
+            window.speechSynthesis.speak(utterance);
+        }
+    </script>
+</body>

@@ -1,0 +1,94 @@
+﻿@model IEnumerable<A23017_Cloud.Models.ScoreBoard>
+
+@{
+    ViewBag.Title = "Index";
+    Layout = "~/Views/Shared/_LayoutPage1.cshtml";
+}
+<head>
+    <style>
+
+        .leader-board {
+            margin: 0px auto;
+            width: 700px;
+            text-align: center;
+            border-collapse: separate;
+            border-spacing: 0px 10px;
+        }
+
+        th{
+            padding: 5px 10px;
+            font-size: 20px;
+        }
+
+        td{
+            padding: 5px 5px;
+            font-size: 15px;
+        }
+
+        .board-row-left {
+            border-bottom-left-radius: 20px;
+            border-top-left-radius: 20px;
+        }
+
+        .board-row-right {
+            border-bottom-right-radius: 20px;
+            border-top-right-radius: 20px;
+        }
+
+        .rank-col {
+            width: 100px;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <h2>LeaderBoard</h2>
+
+    <div>
+        <table class="leader-board">
+            <tr class="text-white bg-primary" style="border-radius: 100px">
+                <th class="rank-col board-row-left">Rank</th>
+                <th>Username</th>
+                <th class="board-row-right">Score</th>
+            </tr>
+
+            @{
+                int i = 1;
+                foreach (var item in Model)
+                {
+                        <tr>
+                            @switch (i)
+                            {
+                                case 1:
+                                    <td class="rank-col border border-4 border-end-0 border-warning board-row-left">@i</td>
+                                    <td class="border-warning border border-4 border-start-0 border-end-0 border-warning">@item.Username</td>
+                                    <td class="border border-4 border-start-0 border-warning board-row-right ">@item.Score</td>
+                                    break;
+                                case 2:
+                                    <td class="rank-col border border-4 border-end-0 border-info board-row-left">@i</td>
+                                    <td class="border border-4 border-start-0 border-end-0 border-info">@item.Username</td>
+                                    <td class="border border-4 border-start-0 border-info board-row-right ">@item.Score</td>
+                                    break;
+                                case 3:
+                                    <td class="rank-col border border-4 border-end-0 border-danger board-row-left">@i</td>
+                                    <td class="border border-4 border-start-0 border-end-0 border-danger">@item.Username</td>
+                                    <td class="border border-4 border-start-0 border-danger board-row-right ">@item.Score</td>
+                                    break;
+                                default:
+                                    <td class="rank-col border border-4 border-end-0 border-dark-subtle board-row-left">@i</td>
+                                    <td class="border border-4 border-start-0 border-end-0 border-dark-subtle">@item.Username</td>
+                                    <td class="border border-4 border-start-0 border-dark-subtle board-row-right ">@item.Score</td>
+                                    break;
+
+                            }
+
+                        </tr>
+                    i++;
+                }
+            }
+        </table>
+    </div>
+</body>
+
+
+

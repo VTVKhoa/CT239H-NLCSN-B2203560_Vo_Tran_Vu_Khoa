@@ -1,0 +1,60 @@
+﻿@model A23017_Cloud.Models.User
+
+@{
+    ViewBag.Title = "Edit";
+    Layout = "~/Views/Shared/_LayoutPage1.cshtml";
+}
+
+<h2>Edit</h2>
+
+<div class="mx-auto" style="width: 50rem">
+    <form action="/Users/Edit" method="post" enctype="multipart/form-data" class="form-control border border-3 border-dark-subtle p-2">
+        @Html.AntiForgeryToken()
+
+        <div class="row mt-2">
+            <div class="col text-center mb-4">
+                <img id="output" src="/Assets/img/avatar/@Model.Avatar" width="150" height="150" style="border: 2px solid black; border-radius: 50%; object-fit: cover;" />
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col mt-1" style="max-width: 100px">
+                <label class="fw-bold" style="max-width: 80px">Username</label>
+            </div>
+            <div class="col">
+                <input type="text" name="Username" class="form-control" value="@Model.Username" readonly />
+            </div>
+        </div>
+
+        <div class="row mt-2">
+            <div class="col mt-1" style="max-width: 100px">
+                <label class="fw-bold" style="max-width: 80px">Password</label>
+            </div>
+            <div class="col">
+                <input type="password" name="Password" class="form-control" value="@Model.Password" />
+            </div>
+        </div>
+
+        <div class="row mt-2">
+            <div class="col mt-1" style="max-width: 100px">
+                <label class="fw-bold" style="max-width: 80px">Avatar</label>
+            </div>
+            <div class="col">
+                <input type="file" name="avatar" class="form-control" onchange="loadAvatar(event)" />
+            </div>
+        </div>
+
+        <div class="text-center mt-4">
+            <a href="/Users/Index" class="btn btn-warning">Cancel</a>
+            <button type="submit" class="btn btn-primary">Save</button>
+        </div>
+    </form>
+</div>
+
+<script>
+    function loadAvatar(event) {
+        var img = document.getElementById("output");
+        img.src = URL.createObjectURL(event.target.files[0]);
+        console.log(event.target.files[0]);
+    }
+</script>

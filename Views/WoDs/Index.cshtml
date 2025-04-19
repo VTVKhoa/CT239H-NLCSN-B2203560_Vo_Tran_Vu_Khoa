@@ -1,0 +1,109 @@
+﻿@model IEnumerable<A23017_Cloud.Models.WoD>
+
+@{
+    ViewBag.Title = "Index";
+    Layout = "~/Views/Shared/_LayoutPage1.cshtml";
+}
+
+@{
+    string icon = "fa-sort-down";
+    if (ViewBag.Icon == "fa-sort-up")
+    {
+        icon = "fa-sort-up";
+    }
+}
+
+<style>
+    .close-btn {
+        width: 30px;
+        height: 30px;
+        border-radius: 50%;
+        border: none;
+        background-color: tomato;
+        color: white;
+        font-weight: bold;
+        font-size: 16px;
+        transition: 0.2s;
+    }
+
+        .close-btn:hover {
+            background-color: darkred;
+            transform: scale(1.1);
+        }
+</style>
+
+<h2>Index</h2>
+
+<dialog name="add">
+    <div class="text-end">
+        <button class="close-btn" onclick="closeDialog()">X</button>
+    </div>
+
+    <div class="text-center mt-3">
+        <a href="/WoDs/Create" class="btn btn-dark text-white mx-auto mt-2">Auto</a>
+        <a href="/WoDs/CreateManual" class="btn btn-dark text-white mx-auto mt-2">Manual</a>
+    </div>
+</dialog>
+
+<table class="table">
+
+    <tr>
+        <td>
+            <button onclick="openDialog()" class="btn btn-primary">Add</button>
+        </td>
+        <td class="text-end">
+            <form>
+                <input type="search" name="search" class="w-25 rounded-2 focus-ring-primary" style="margin-top: 5px" />
+                <button type="submit" class="btn btn-primary">Search</button>
+            </form>
+        </td>
+    </tr>
+</table>
+
+
+<table class="table">
+    <tr>
+        <th>
+            @Html.DisplayNameFor(model => model.Word)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.Phonetic)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.Definition)
+        </th>
+        <th></th>
+    </tr>
+
+    @foreach (var item in Model)
+    {
+        <tr>
+            <td>
+                @Html.DisplayFor(modelItem => item.Word)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Phonetic)
+            </td>
+            <td class="w-50">
+                @Html.DisplayFor(modelItem => item.Definition)
+            </td>
+            <td class="text-center">
+                @Html.ActionLink("Edit", "Edit", new { id = item.ID }, htmlAttributes: new { @class = "btn btn-warning" })
+                @Html.ActionLink("Details", "Details", new { id = item.ID }, htmlAttributes: new { @class = "btn btn-primary" })
+                @Html.ActionLink("Delete", "Delete", new { id = item.ID }, htmlAttributes: new { @class = "btn btn-danger" })
+            </td>
+        </tr>
+    }
+</table>
+
+<script>
+    const dialog = document.querySelector("dialog[name='add']");
+
+    function openDialog() {
+        dialog.showModal();
+    }
+
+    function closeDialog() {
+        dialog.close();
+    }
+</script>

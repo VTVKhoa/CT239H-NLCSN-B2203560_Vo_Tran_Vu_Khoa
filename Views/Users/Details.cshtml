@@ -1,0 +1,40 @@
+﻿@model A23017_Cloud.Models.User
+
+@{
+    ViewBag.Title = "Details";
+    Layout = "~/Views/Shared/_LayoutPage1.cshtml";
+}
+
+<div class="mx-auto" style="width: 50rem">
+    <div class="form-control border border-3 border-dark-subtle p-2">
+        <div class="row mt-2">
+            <div class="col text-center mb-4">
+                <img src="/Assets/img/avatar/@Model.Avatar" width="150" height="150" style="border: 2px solid black; border-radius: 50%; object-fit: cover;" />
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col mt-1" style="max-width: 100px">
+                <label class="fw-bold" style="max-width: 80px">Username</label>
+            </div>
+            <div class="col">
+                <input type="text" name="Username" class="form-control" value="@Model.Username" disabled />
+            </div>
+        </div>
+
+        <div class="row mt-2">
+            <div class="col mt-1" style="max-width: 100px">
+                <label class="fw-bold" style="max-width: 80px">Password</label>
+            </div>
+            <div class="col">
+                <input type="text" name="Password" class="form-control" value="@Model.Password" disabled />
+            </div>
+        </div>
+
+        <div class="text-center mt-4">
+            <a href="/Users/Admin" class="btn btn-warning">Back</a>
+            <a href="/Users/Edit/@Session["Username"]" class="btn btn-primary">Edit</a>
+            <a href="/Users/Logout" class="btn btn-danger">Logout</a>
+        </div>
+    </div>
+</div>
