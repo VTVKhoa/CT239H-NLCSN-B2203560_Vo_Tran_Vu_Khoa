@@ -1,7 +1,7 @@
 Tài khoản:  
     Player:  
-        tên: Khoa  
-        mật khẩu: 12345  
+    &nbsp;tên: Khoa  
+    &nbsp;mật khẩu: 12345  
     Admin:  
-        tên: Admin  
-        mật khẩu: 12345  
+    &nbsp;tên: Admin  
+    &nbsp;mật khẩu: 12345  
