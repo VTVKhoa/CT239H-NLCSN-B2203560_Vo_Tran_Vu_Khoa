@@ -1,7 +1,7 @@
 Tài khoản:  
-  Player:  
+    Player:  
     tên: Khoa  
     mật khẩu: 12345  
-  Admin:  
+    Admin:  
     tên: Admin  
     mật khẩu: 12345  
