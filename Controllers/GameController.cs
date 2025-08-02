@@ -22,5 +22,14 @@ namespace A23017_Cloud.Controllers
 
             return View(word);
         }
+
+        protected override void Dispose(bool disposing)
+        {
+            if (disposing)
+            {
+                db.Dispose();
+            }
+            base.Dispose(disposing);
+        }
     }
 }

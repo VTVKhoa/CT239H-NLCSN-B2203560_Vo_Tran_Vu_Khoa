@@ -12,6 +12,8 @@ namespace A23017_Cloud.Models
         public string Username { get; set; }
 
         [Required]
+        [MinLength(5)]
+        [DataType(DataType.Password)]
         public string Password { get; set; }
 
         public string Avatar { get; set; } = "blank.jpg";

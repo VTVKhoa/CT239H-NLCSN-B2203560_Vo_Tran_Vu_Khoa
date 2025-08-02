@@ -8,6 +8,7 @@ using System.Net;
 using System.Web;
 using System.Web.Mvc;
 using A23017_Cloud.Models;
+using A23017_Cloud.Utils;
 
 namespace A23017_Cloud.Controllers
 {
@@ -35,7 +36,7 @@ namespace A23017_Cloud.Controllers
         public ActionResult Login(string Username, string Password)
         {
             User user = db.Users.Find(Username);
-            if (user == null || user.Password != Password)
+            if (user == null || user.Password != Hash.HashString(Password))
             {
                 Session["validate"] = "false";
                 return RedirectToAction("Login");
@@ -93,16 +94,22 @@ namespace A23017_Cloud.Controllers
             if (db.Users.Any(u => u.Username == user.Username))
             {
                 ModelState.AddModelError("Username", "This user has already existed");
-                return View("Create");
+                user.Password = null;
+                return View(user);
             }
             if (ModelState.IsValid)
             {
+                user.Password = Hash.HashString(user.Password);
                 db.Users.Add(user);
                 db.SaveChanges();
                 return RedirectToAction("Index");
             }
-
-            return View(user);
+            else
+            {
+                ModelState.AddModelError("Password", "The password is too short");
+                user.Password = null;
+                return View(user);
+            }
         }
 
         // GET: Users/Edit/5
@@ -127,32 +134,44 @@ namespace A23017_Cloud.Controllers
         [ValidateAntiForgeryToken]
         public ActionResult Edit(string Username, string Password, HttpPostedFileBase Avatar)
         {
-            User user = new User();
-
-            if (ModelState.IsValid)
+            User user = db.Users.Find(Username);
+            if (user == null)
             {
-                user.Username = Username;
-                user.Password = Password;
-                if (Avatar != null)
-                {
-                    string fileName = System.IO.Path.GetFileName(Avatar.FileName);
-                    string path = Server.MapPath("~/Assets/img/avatar/" + fileName);
-
-                    string date = DateTime.Now.ToString("dd-MM-yyyy-HH-mm-ss");
-                    string extention = Path.GetExtension(path);
-                    string newFileName = Path.GetFileNameWithoutExtension(path).ToString() + "_" + date + extention;
-
-                    path = Server.MapPath("~/Assets/img/avatar/" + newFileName);
-
-                    Avatar.SaveAs(path);
-                    user.Avatar = newFileName;
-
-                }
-                db.Entry(user).State = EntityState.Modified;
-                db.SaveChanges();
                 return RedirectToAction("Index");
             }
-            return View(user);
+            if (Password != null && Password.Length < 5 && Password.Length > 0)
+            {
+                user.Password = null;
+                return View(user);
+            }
+            else if (Password != null)
+            {
+                user.Password = Hash.HashString(Password);
+            } 
+            if (Avatar != null)
+            {
+                if (Avatar.ContentType != "image/png" && Avatar.ContentType != "image/jpeg")
+                {
+                    return View(user);
+                }
+                if (Avatar.ContentLength > 5242880)
+                {
+                    return View(user);
+                }
+                FileHandler fileHandler = new FileHandler();
+                string tenFileMoi = fileHandler.Save(Avatar, "Assets/img/avatar");
+                if (user.Avatar != null && user.Avatar != "blank.jpg")
+                {
+                    fileHandler.Delete(user.Avatar, "Assets/img/avatar");
+                }
+                user.Avatar = tenFileMoi;
+            }
+            db.SaveChanges();
+            if (user.Username == Session["Username"].ToString())
+            {
+                Session["user"] = user;
+            }
+            return RedirectToAction("Index");
         }
 
         // GET: Users/Delete/5
@@ -176,8 +195,18 @@ namespace A23017_Cloud.Controllers
         public ActionResult DeleteConfirmed(string id)
         {
             User user = db.Users.Find(id);
+            if (user == null)
+            {
+                return RedirectToAction("Index");
+            }
+            string avatar = user.Avatar;
             db.Users.Remove(user);
             db.SaveChanges();
+            if (avatar != "blank.jpg")
+            {
+                FileHandler fileHandler = new FileHandler();
+                fileHandler.Delete(avatar, "Assets/img/avatar");
+            }
             return RedirectToAction("Index");
         }
 

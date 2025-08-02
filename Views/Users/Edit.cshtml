@@ -31,7 +31,7 @@
                 <label class="fw-bold" style="max-width: 80px">Password</label>
             </div>
             <div class="col">
-                <input type="password" name="Password" class="form-control" value="@Model.Password" />
+                <input type="password" name="Password" class="form-control" />
             </div>
         </div>
 
@@ -40,7 +40,7 @@
                 <label class="fw-bold" style="max-width: 80px">Avatar</label>
             </div>
             <div class="col">
-                <input type="file" name="avatar" class="form-control" onchange="loadAvatar(event)" />
+                <input type="file" name="avatar" class="form-control" onchange="loadAvatar(event)" accept="image/png, image/jpeg" />
             </div>
         </div>
 
